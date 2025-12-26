@@ -18,16 +18,10 @@
             </div>
 
             <!-- Fase 1: Coletar Ingredientes -->
-            <div id="phase1-screen" class="screen">
-                <div class="phase-header">
-                    <img src="assets/images/sprites/axolote-ensinando.png" alt="Axolote ensinando" class="character-small">
-                    <div class="speech-bubble">
-                        <p>Clique nos 4 ingredientes para coletá-los!</p>
-                    </div>
-                </div>
-                <div class="phase-content">
-                    <h2>Fase 1: Coletando Ingredientes</h2>
-                    <div class="ingredients-grid">
+            <div id="phase1-screen" class="screen kitchen-scene">
+                <div class="kitchen-layout">
+                    <!-- Ingredientes da Esquerda -->
+                    <div class="ingredients-left">
                         <button class="ingredient-btn" data-ingredient="ovo" onclick="collectIngredient('ovo')">
                             <img src="assets/images/ingredients/ovo.png" alt="Ovo">
                             <span>Ovo</span>
@@ -36,6 +30,21 @@
                             <img src="assets/images/ingredients/leite.png" alt="Leite">
                             <span>Leite</span>
                         </button>
+                    </div>
+                    
+                    <!-- Axolote no Centro -->
+                    <div class="kitchen-center">
+                        <img src="assets/images/sprites/axolote-ensinando.png" alt="Chefe Axolote" class="chef-axolote">
+                        <div class="speech-bubble-kitchen">
+                            <p>Clique nos ingredientes para coletá-los!</p>
+                        </div>
+                        <div class="progress-indicator-kitchen">
+                            <p>Ingredientes: <span id="collected-count">0</span>/4</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Ingredientes da Direita -->
+                    <div class="ingredients-right">
                         <button class="ingredient-btn" data-ingredient="farinha" onclick="collectIngredient('farinha')">
                             <img src="assets/images/ingredients/farinha.png" alt="Farinha">
                             <span>Farinha</span>
@@ -44,9 +53,6 @@
                             <img src="assets/images/ingredients/acucar.png" alt="Açúcar">
                             <span>Açúcar</span>
                         </button>
-                    </div>
-                    <div class="progress-indicator">
-                        <p>Ingredientes coletados: <span id="collected-count">0</span>/4</p>
                     </div>
                 </div>
             </div>
