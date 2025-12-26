@@ -1,11 +1,14 @@
 // Estado do jogo
 let currentPhase = 0;
+let collectedIngredients = [];
+let mixCount = 0;
+let decorationCount = 0;
 
 // Contexto de áudio
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 // Função para criar sons usando Web Audio API
-function playSound(type) {
+function playSound(type, frequency = 440) {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -13,21 +16,70 @@ function playSound(type) {
     gainNode.connect(audioContext.destination);
     
     switch(type) {
-        case 'click':
-            // Som de clique alegre
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+        case 'collect':
+            // Som de coleta de ingrediente (específico por tipo)
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.5, audioContext.currentTime + 0.15);
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+            break;
+            
+        case 'mix':
+            // Som de mistura
+            oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+            break;
+            
+        case 'pour':
+            // Som de despejar líquido
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            break;
+            
+        case 'close':
+            // Som de fechar máquina
+            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+            break;
+            
+        case 'open':
+            // Som de abrir máquina
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+            break;
+            
+        case 'decorate':
+            // Som de decoração
+            oscillator.frequency.setValueAtTime(700, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(900, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
             break;
             
         case 'phase':
-            // Som de transição de fase (mais musical)
-            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+            // Som de transição de fase
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
             gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
             oscillator.start(audioContext.currentTime);
@@ -35,8 +87,8 @@ function playSound(type) {
             break;
             
         case 'victory':
-            // Som de vitória (melodia ascendente)
-            const notes = [523.25, 587.33, 659.25, 783.99, 880.00]; // C5, D5, E5, G5, A5
+            // Som de vitória
+            const notes = [523.25, 587.33, 659.25, 783.99, 880.00];
             notes.forEach((freq, index) => {
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
@@ -53,7 +105,7 @@ function playSound(type) {
             break;
             
         case 'start':
-            // Som de início (nota alegre e ascendente)
+            // Som de início
             oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.2);
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
@@ -87,30 +139,257 @@ function showScreen(screenId) {
 function startGame() {
     playSound('start');
     currentPhase = 1;
+    collectedIngredients = [];
+    mixCount = 0;
+    decorationCount = 0;
+    
+    // Resetar ingredientes
+    const ingredientBtns = document.querySelectorAll('.ingredient-btn');
+    ingredientBtns.forEach(btn => {
+        btn.classList.remove('collected');
+    });
+    
+    document.getElementById('collected-count').textContent = '0';
     showScreen('phase1-screen');
 }
 
-// Função para avançar para a próxima fase
-function nextPhase(phase) {
-    playSound('phase');
-    currentPhase = phase;
+// FASE 1: Coletar Ingredientes
+function collectIngredient(ingredient) {
+    if (collectedIngredients.includes(ingredient)) return;
     
-    if (phase === 4) {
-        // Tela de vitória
+    // Sons diferentes para cada ingrediente
+    const frequencies = {
+        'ovo': 500,
+        'leite': 600,
+        'farinha': 700,
+        'acucar': 800
+    };
+    
+    playSound('collect', frequencies[ingredient]);
+    
+    collectedIngredients.push(ingredient);
+    
+    // Marcar botão como coletado
+    const btn = document.querySelector(`[data-ingredient="${ingredient}"]`);
+    btn.classList.add('collected');
+    
+    // Atualizar contador
+    document.getElementById('collected-count').textContent = collectedIngredients.length;
+    
+    // Se coletou todos, avançar após 1 segundo
+    if (collectedIngredients.length === 4) {
         setTimeout(() => {
-            showScreen('phase4-screen');
-            playSound('victory');
-            createConfetti();
-        }, 300);
-    } else {
-        showScreen(`phase${phase}-screen`);
+            playSound('phase');
+            currentPhase = 2;
+            showScreen('phase2-screen');
+            setupMixingPhase();
+        }, 1000);
     }
+}
+
+// FASE 2: Configurar fase de mistura
+function setupMixingPhase() {
+    mixCount = 0;
+    document.getElementById('mix-count').textContent = '0';
+    document.getElementById('mix-progress').style.width = '0%';
+    
+    // Adicionar ingredientes na tigela
+    const ingredientsInBowl = document.getElementById('ingredients-in-bowl');
+    ingredientsInBowl.innerHTML = '';
+    
+    collectedIngredients.forEach((ingredient, index) => {
+        setTimeout(() => {
+            const img = document.createElement('img');
+            img.src = `assets/images/ingredients/${ingredient}.png`;
+            img.alt = ingredient;
+            ingredientsInBowl.appendChild(img);
+        }, index * 200);
+    });
+}
+
+// FASE 2: Misturar ingredientes
+function mixIngredients() {
+    if (mixCount >= 10) return;
+    
+    playSound('mix');
+    mixCount++;
+    
+    // Animar colher
+    const spoon = document.getElementById('spoon');
+    spoon.classList.add('mixing');
+    setTimeout(() => {
+        spoon.classList.remove('mixing');
+    }, 300);
+    
+    // Atualizar progresso
+    document.getElementById('mix-count').textContent = mixCount;
+    document.getElementById('mix-progress').style.width = (mixCount * 10) + '%';
+    
+    // Se completou, avançar
+    if (mixCount === 10) {
+        setTimeout(() => {
+            playSound('phase');
+            currentPhase = 3;
+            showScreen('phase3-screen');
+        }, 1000);
+    }
+}
+
+// FASE 3: Despejar massa
+function pourBatter() {
+    playSound('pour');
+    
+    // Desabilitar botão
+    event.target.disabled = true;
+    event.target.textContent = 'Despejando... 🥣';
+    
+    setTimeout(() => {
+        playSound('phase');
+        currentPhase = 4;
+        showScreen('phase4-screen');
+    }, 1500);
+}
+
+// FASE 4: Fechar máquina e cozinhar
+function closeMachine() {
+    playSound('close');
+    
+    // Desabilitar botão
+    const closeButton = document.getElementById('close-button');
+    closeButton.disabled = true;
+    closeButton.style.display = 'none';
+    
+    // Mostrar progresso de cozimento
+    const cookingProgress = document.getElementById('cooking-progress');
+    cookingProgress.style.display = 'block';
+    
+    // Adicionar vapor
+    createSteam();
+    
+    // Simular cozimento
+    let cookingPercent = 0;
+    const cookingInterval = setInterval(() => {
+        cookingPercent += 5;
+        document.getElementById('cooking-percent').textContent = cookingPercent;
+        document.getElementById('cooking-bar').style.width = cookingPercent + '%';
+        
+        if (cookingPercent >= 100) {
+            clearInterval(cookingInterval);
+            setTimeout(() => {
+                playSound('phase');
+                currentPhase = 5;
+                showScreen('phase5-screen');
+            }, 500);
+        }
+    }, 200);
+}
+
+// Criar efeito de vapor
+function createSteam() {
+    const steamContainer = document.getElementById('steam');
+    
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            const steamPuff = document.createElement('div');
+            steamPuff.style.position = 'absolute';
+            steamPuff.style.width = '30px';
+            steamPuff.style.height = '30px';
+            steamPuff.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+            steamPuff.style.borderRadius = '50%';
+            steamPuff.style.left = (Math.random() * 80 + 10) + '%';
+            steamPuff.style.bottom = '40%';
+            steamPuff.style.filter = 'blur(5px)';
+            
+            steamContainer.appendChild(steamPuff);
+            
+            steamPuff.animate([
+                { 
+                    transform: 'translateY(0) scale(1)',
+                    opacity: 0.6
+                },
+                { 
+                    transform: 'translateY(-100px) scale(1.5)',
+                    opacity: 0
+                }
+            ], {
+                duration: 2000,
+                easing: 'ease-out'
+            });
+            
+            setTimeout(() => {
+                steamPuff.remove();
+            }, 2000);
+        }, i * 300);
+    }
+}
+
+// FASE 5: Abrir máquina
+function openMachine() {
+    playSound('open');
+    
+    event.target.disabled = true;
+    event.target.textContent = 'Abrindo... 🎊';
+    
+    setTimeout(() => {
+        playSound('phase');
+        currentPhase = 6;
+        showScreen('phase6-screen');
+    }, 1000);
+}
+
+// FASE 6: Adicionar decoração
+function addDecoration(decoration) {
+    playSound('decorate');
+    decorationCount++;
+    
+    const decorationsLayer = document.getElementById('decorations-layer');
+    const decorationItem = document.createElement('img');
+    decorationItem.src = `assets/images/decorations/${decoration}.png`;
+    decorationItem.alt = decoration;
+    decorationItem.className = 'decoration-item';
+    
+    // Posição aleatória
+    const randomX = Math.random() * 60 + 20; // 20% a 80%
+    const randomY = Math.random() * 60 + 20; // 20% a 80%
+    decorationItem.style.left = randomX + '%';
+    decorationItem.style.top = randomY + '%';
+    
+    decorationsLayer.appendChild(decorationItem);
+}
+
+// FASE 6: Finalizar decoração
+function finishDecoration() {
+    if (decorationCount === 0) {
+        alert('Adicione pelo menos uma decoração ao seu waffle! 🎨');
+        return;
+    }
+    
+    playSound('phase');
+    currentPhase = 7;
+    showScreen('phase7-screen');
+    
+    setTimeout(() => {
+        playSound('victory');
+        createConfetti();
+    }, 500);
 }
 
 // Função para reiniciar o jogo
 function restartGame() {
-    playSound('click');
+    playSound('start');
+    
+    // Limpar decorações
+    const decorationsLayer = document.getElementById('decorations-layer');
+    if (decorationsLayer) {
+        decorationsLayer.innerHTML = '';
+    }
+    
+    // Resetar estado
     currentPhase = 0;
+    collectedIngredients = [];
+    mixCount = 0;
+    decorationCount = 0;
+    
     showScreen('start-screen');
 }
 
@@ -165,9 +444,7 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
         if (currentPhase === 0) {
             startGame();
-        } else if (currentPhase > 0 && currentPhase < 4) {
-            nextPhase(currentPhase + 1);
-        } else if (currentPhase === 4) {
+        } else if (currentPhase === 7) {
             restartGame();
         }
     }

@@ -48,13 +48,12 @@ body {
     width: 100%;
     height: 100%;
     display: none;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
     padding: 40px;
     opacity: 0;
     transform: scale(0.9);
     transition: opacity 0.5s ease, transform 0.5s ease;
+    overflow-y: auto;
 }
 
 .screen.active {
@@ -66,6 +65,8 @@ body {
 /* Tela de Início */
 #start-screen {
     background: linear-gradient(180deg, #ffeaa7 0%, #fdcb6e 50%, #fab1a0 100%);
+    justify-content: center;
+    align-items: center;
 }
 
 .game-title {
@@ -94,6 +95,13 @@ body {
     50% { transform: translateY(-15px); }
 }
 
+.character-small {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    animation: float 3s ease-in-out infinite;
+}
+
 .subtitle {
     font-size: 2rem;
     color: #2d3436;
@@ -101,24 +109,200 @@ body {
     text-align: center;
 }
 
-/* Fases do Jogo */
+/* Cabeçalho das Fases */
+.phase-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.speech-bubble {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 20px;
+    border: 3px solid #6c5ce7;
+    position: relative;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 15px solid #6c5ce7;
+}
+
+.speech-bubble p {
+    font-size: 1.3rem;
+    color: #2d3436;
+    margin: 0;
+}
+
+/* Conteúdo das Fases */
 .phase-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
     gap: 20px;
 }
 
-.phase-image {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    object-fit: contain;
+.phase-content h2 {
+    font-size: 2.5rem;
+    color: #6c5ce7;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Fase 1: Grade de Ingredientes */
+.ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.ingredient-btn {
+    background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+    border: none;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.ingredient-btn img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.ingredient-btn span {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: bold;
+}
+
+.ingredient-btn:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.ingredient-btn:hover img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.ingredient-btn.collected {
+    opacity: 0.5;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.ingredient-btn.collected img {
+    filter: grayscale(100%);
+}
+
+/* Fase 2: Área de Mistura */
+.mixing-area {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bowl {
+    width: 350px;
+    height: 350px;
+    object-fit: contain;
+    position: absolute;
+}
+
+.spoon {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    position: absolute;
+    z-index: 10;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.spoon.mixing {
+    animation: mixAnimation 0.3s ease;
+}
+
+@keyframes mixAnimation {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+}
+
+.ingredients-in-bowl {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 5;
+}
+
+.ingredients-in-bowl img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    animation: ingredientDrop 0.5s ease;
+}
+
+@keyframes ingredientDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mix-button {
+    margin-top: 20px;
+}
+
+/* Fase 3 e 4: Área da Máquina */
+.machine-area {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.machine {
+    width: 450px;
+    height: 450px;
+    object-fit: contain;
     animation: fadeInScale 0.6s ease;
 }
 
@@ -131,6 +315,141 @@ body {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.steam {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Fase 6: Decoração do Waffle */
+.waffle-decoration-area {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px 0;
+}
+
+.waffle-canvas {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.waffle-base {
+    width: 350px;
+    height: 350px;
+    object-fit: contain;
+    position: absolute;
+}
+
+.decorations-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.decoration-item {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    animation: decorationPop 0.3s ease;
+}
+
+@keyframes decorationPop {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.decorations-grid {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.decoration-btn {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.decoration-btn img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.decoration-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Indicadores de Progresso */
+.progress-indicator {
+    text-align: center;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.progress-indicator p {
+    font-size: 1.5rem;
+    color: #2d3436;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 30px;
+    background: #dfe6e9;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00b894 0%, #00cec9 100%);
+    border-radius: 15px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Tela de Vitória */
+.victory {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffecd2 100%);
+}
+
+.phase-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.6s ease;
 }
 
 .text-box {
@@ -165,11 +484,6 @@ body {
     font-size: 1.5rem;
     color: #ffffff;
     line-height: 1.6;
-}
-
-/* Tela de Vitória */
-.victory {
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffecd2 100%);
 }
 
 .victory-box {
@@ -234,12 +548,45 @@ body {
         height: 200px;
     }
     
-    .text-box h2 {
+    .character-small {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .speech-bubble p {
+        font-size: 1rem;
+    }
+    
+    .phase-content h2 {
         font-size: 1.8rem;
     }
     
-    .text-box p {
-        font-size: 1.2rem;
+    .ingredients-grid {
+        gap: 15px;
+    }
+    
+    .ingredient-btn {
+        padding: 20px;
+    }
+    
+    .ingredient-btn img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .mixing-area, .machine-area, .waffle-canvas {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .bowl, .machine {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .waffle-base {
+        width: 250px;
+        height: 250px;
     }
     
     .game-button {
@@ -262,16 +609,8 @@ body {
         height: 150px;
     }
     
-    .text-box {
-        padding: 20px;
-    }
-    
-    .text-box h2 {
+    .phase-content h2 {
         font-size: 1.5rem;
-    }
-    
-    .text-box p {
-        font-size: 1rem;
     }
     
     .game-button {

@@ -17,49 +17,177 @@
                 <button class="game-button" onclick="startGame()">Começar a Cozinhar! 🎉</button>
             </div>
 
-            <!-- Fase 1: Mistura -->
+            <!-- Fase 1: Coletar Ingredientes -->
             <div id="phase1-screen" class="screen">
-                <div class="phase-content">
-                    <img src="assets/images/phases/fase1-mistura.png" alt="Misturando ingredientes" class="phase-image">
-                    <div class="text-box">
-                        <h2>Fase 1: Misturando os Ingredientes</h2>
-                        <p>Vamos misturar ovo, leite, farinha e açúcar para fazer a massa do waffle!</p>
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-ensinando.png" alt="Axolote ensinando" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Clique nos 4 ingredientes para coletá-los!</p>
                     </div>
-                    <button class="game-button" onclick="nextPhase(2)">Continuar ➡️</button>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 1: Coletando Ingredientes</h2>
+                    <div class="ingredients-grid">
+                        <button class="ingredient-btn" data-ingredient="ovo" onclick="collectIngredient('ovo')">
+                            <img src="assets/images/ingredients/ovo.png" alt="Ovo">
+                            <span>Ovo</span>
+                        </button>
+                        <button class="ingredient-btn" data-ingredient="leite" onclick="collectIngredient('leite')">
+                            <img src="assets/images/ingredients/leite.png" alt="Leite">
+                            <span>Leite</span>
+                        </button>
+                        <button class="ingredient-btn" data-ingredient="farinha" onclick="collectIngredient('farinha')">
+                            <img src="assets/images/ingredients/farinha.png" alt="Farinha">
+                            <span>Farinha</span>
+                        </button>
+                        <button class="ingredient-btn" data-ingredient="acucar" onclick="collectIngredient('acucar')">
+                            <img src="assets/images/ingredients/acucar.png" alt="Açúcar">
+                            <span>Açúcar</span>
+                        </button>
+                    </div>
+                    <div class="progress-indicator">
+                        <p>Ingredientes coletados: <span id="collected-count">0</span>/4</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Fase 2: Máquina -->
+            <!-- Fase 2: Misturar Ingredientes -->
             <div id="phase2-screen" class="screen">
-                <div class="phase-content">
-                    <img src="assets/images/phases/fase2-maquina.png" alt="Máquina de waffle" class="phase-image">
-                    <div class="text-box">
-                        <h2>Fase 2: Na Máquina de Waffle</h2>
-                        <p>Agora vamos colocar a massa na máquina mágica e esperar assar!</p>
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-ensinando.png" alt="Axolote ensinando" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Clique 10 vezes para misturar bem!</p>
                     </div>
-                    <button class="game-button" onclick="nextPhase(3)">Continuar ➡️</button>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 2: Misturando a Massa</h2>
+                    <div class="mixing-area">
+                        <img src="assets/images/ui/tigela-vazia.png" alt="Tigela" class="bowl">
+                        <img src="assets/images/ui/colher.png" alt="Colher" class="spoon" id="spoon">
+                        <div class="ingredients-in-bowl" id="ingredients-in-bowl"></div>
+                    </div>
+                    <button class="game-button mix-button" id="mix-button" onclick="mixIngredients()">
+                        Misturar! 🥄
+                    </button>
+                    <div class="progress-indicator">
+                        <p>Misturas: <span id="mix-count">0</span>/10</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="mix-progress"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Fase 3: Waffle Pronto -->
+            <!-- Fase 3: Despejar na Máquina -->
             <div id="phase3-screen" class="screen">
-                <div class="phase-content">
-                    <img src="assets/images/phases/fase3-pronto.png" alt="Waffle pronto" class="phase-image">
-                    <div class="text-box">
-                        <h2>Fase 3: Waffle Pronto!</h2>
-                        <p>Olha que lindo! Nosso waffle de coração está perfeito e douradinho!</p>
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-ensinando.png" alt="Axolote ensinando" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Clique para despejar a massa na máquina!</p>
                     </div>
-                    <button class="game-button" onclick="nextPhase(4)">Ver Resultado 🎊</button>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 3: Despejando a Massa</h2>
+                    <div class="machine-area">
+                        <img src="assets/images/ui/maquina-aberta.png" alt="Máquina aberta" class="machine" id="machine-open">
+                    </div>
+                    <button class="game-button" onclick="pourBatter()">
+                        Despejar Massa! 🥣
+                    </button>
                 </div>
             </div>
 
-            <!-- Fase 4: Vitória -->
+            <!-- Fase 4: Fechar Máquina e Cozinhar -->
             <div id="phase4-screen" class="screen">
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-feliz.png" alt="Axolote feliz" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Clique para fechar a máquina e começar a cozinhar!</p>
+                    </div>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 4: Cozinhando o Waffle</h2>
+                    <div class="machine-area">
+                        <img src="assets/images/ui/maquina-fechada.png" alt="Máquina fechada" class="machine" id="machine-closed">
+                        <div class="steam" id="steam"></div>
+                    </div>
+                    <button class="game-button" id="close-button" onclick="closeMachine()">
+                        Fechar Máquina! 🔥
+                    </button>
+                    <div class="progress-indicator" id="cooking-progress" style="display: none;">
+                        <p>Cozinhando... <span id="cooking-percent">0</span>%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="cooking-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fase 5: Abrir Máquina e Revelar Waffle -->
+            <div id="phase5-screen" class="screen">
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-surpreso.png" alt="Axolote surpreso" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Clique para abrir e ver o waffle!</p>
+                    </div>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 5: Revelando o Waffle</h2>
+                    <div class="machine-area">
+                        <img src="assets/images/ui/maquina-fechada.png" alt="Máquina fechada" class="machine">
+                    </div>
+                    <button class="game-button" onclick="openMachine()">
+                        Abrir Máquina! 🎊
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fase 6: Decorar o Waffle -->
+            <div id="phase6-screen" class="screen">
+                <div class="phase-header">
+                    <img src="assets/images/sprites/axolote-feliz.png" alt="Axolote feliz" class="character-small">
+                    <div class="speech-bubble">
+                        <p>Decore seu waffle! Clique nas coberturas!</p>
+                    </div>
+                </div>
+                <div class="phase-content">
+                    <h2>Fase 6: Decorando o Waffle</h2>
+                    <div class="waffle-decoration-area">
+                        <div class="waffle-canvas" id="waffle-canvas">
+                            <img src="assets/images/ui/waffle-simples.png" alt="Waffle" class="waffle-base">
+                            <div class="decorations-layer" id="decorations-layer"></div>
+                        </div>
+                    </div>
+                    <div class="decorations-grid">
+                        <button class="decoration-btn" onclick="addDecoration('morango')">
+                            <img src="assets/images/decorations/morango.png" alt="Morango">
+                        </button>
+                        <button class="decoration-btn" onclick="addDecoration('banana')">
+                            <img src="assets/images/decorations/banana.png" alt="Banana">
+                        </button>
+                        <button class="decoration-btn" onclick="addDecoration('chocolate')">
+                            <img src="assets/images/decorations/chocolate.png" alt="Chocolate">
+                        </button>
+                        <button class="decoration-btn" onclick="addDecoration('mel')">
+                            <img src="assets/images/decorations/mel.png" alt="Mel">
+                        </button>
+                        <button class="decoration-btn" onclick="addDecoration('chantilly')">
+                            <img src="assets/images/decorations/chantilly.png" alt="Chantilly">
+                        </button>
+                    </div>
+                    <button class="game-button" onclick="finishDecoration()">
+                        Finalizar! ✨
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fase 7: Vitória -->
+            <div id="phase7-screen" class="screen">
                 <div class="phase-content victory">
                     <img src="assets/images/phases/fase4-vitoria.png" alt="Vitória" class="phase-image">
                     <div class="text-box victory-box">
                         <h2 class="victory-title">🎉 PARABÉNS! 🎉</h2>
-                        <p class="victory-text">Você aprendeu a fazer waffles com o Chefe Axolote!</p>
+                        <p class="victory-text">Você fez um waffle delicioso com o Chefe Axolote!</p>
                     </div>
                     <button class="game-button restart" onclick="restartGame()">Fazer Outro Waffle! 🧇</button>
                 </div>
