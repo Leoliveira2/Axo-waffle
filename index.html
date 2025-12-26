@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waffle Mágico - Jogo do Chefe Axolote</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-screen">
+            <!-- Tela de Início -->
+            <div id="start-screen" class="screen active">
+                <h1 class="game-title">🧇 Waffle Mágico 🧇</h1>
+                <img src="assets/images/sprites/axolote-idle.png" alt="Chefe Axolote" class="character-large">
+                <h2 class="subtitle">Aprenda a fazer waffles com o Chefe Axolote!</h2>
+                <button class="game-button" onclick="startGame()">Começar a Cozinhar! 🎉</button>
+            </div>
+
+            <!-- Fase 1: Mistura -->
+            <div id="phase1-screen" class="screen">
+                <div class="phase-content">
+                    <img src="assets/images/phases/fase1-mistura.png" alt="Misturando ingredientes" class="phase-image">
+                    <div class="text-box">
+                        <h2>Fase 1: Misturando os Ingredientes</h2>
+                        <p>Vamos misturar ovo, leite, farinha e açúcar para fazer a massa do waffle!</p>
+                    </div>
+                    <button class="game-button" onclick="nextPhase(2)">Continuar ➡️</button>
+                </div>
+            </div>
+
+            <!-- Fase 2: Máquina -->
+            <div id="phase2-screen" class="screen">
+                <div class="phase-content">
+                    <img src="assets/images/phases/fase2-maquina.png" alt="Máquina de waffle" class="phase-image">
+                    <div class="text-box">
+                        <h2>Fase 2: Na Máquina de Waffle</h2>
+                        <p>Agora vamos colocar a massa na máquina mágica e esperar assar!</p>
+                    </div>
+                    <button class="game-button" onclick="nextPhase(3)">Continuar ➡️</button>
+                </div>
+            </div>
+
+            <!-- Fase 3: Waffle Pronto -->
+            <div id="phase3-screen" class="screen">
+                <div class="phase-content">
+                    <img src="assets/images/phases/fase3-pronto.png" alt="Waffle pronto" class="phase-image">
+                    <div class="text-box">
+                        <h2>Fase 3: Waffle Pronto!</h2>
+                        <p>Olha que lindo! Nosso waffle de coração está perfeito e douradinho!</p>
+                    </div>
+                    <button class="game-button" onclick="nextPhase(4)">Ver Resultado 🎊</button>
+                </div>
+            </div>
+
+            <!-- Fase 4: Vitória -->
+            <div id="phase4-screen" class="screen">
+                <div class="phase-content victory">
+                    <img src="assets/images/phases/fase4-vitoria.png" alt="Vitória" class="phase-image">
+                    <div class="text-box victory-box">
+                        <h2 class="victory-title">🎉 PARABÉNS! 🎉</h2>
+                        <p class="victory-text">Você aprendeu a fazer waffles com o Chefe Axolote!</p>
+                    </div>
+                    <button class="game-button restart" onclick="restartGame()">Fazer Outro Waffle! 🧇</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
